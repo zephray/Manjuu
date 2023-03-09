@@ -1,6 +1,26 @@
+#
+# Manjuu
+# Copyright 2023 Wenting Zhang
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 import math
-from manjuuconsts import *
-from manjuutypes import *
 import copy
 
 def reverse(type):
@@ -58,6 +78,13 @@ def gen_wire(prefix, type, count=1):
             _, width, name = _get_pin(entry)
             print("wire" + width + prefix + "_" + name + postfix + ";")
 
+def gen_reg(prefix, type, count=1):
+    for i in range(count):
+        postfix = "" if count == 1 else str(i)
+        for entry in type:
+            _, width, name = _get_pin(entry)
+            print("reg" + width + prefix + "_" + name + postfix + ";")
+
 def gen_connect(port_prefix, type, wire_prefix="", last_comma=True, count=1):
     if wire_prefix == "":
         wire_prefix = port_prefix
@@ -73,6 +100,15 @@ def gen_connect(port_prefix, type, wire_prefix="", last_comma=True, count=1):
             else:
                 out = out[:-1] # Remove trailing new line
         print(out, end="")
+    
+def gen_capture(dst_prefix, type, src_prefix="", count=1):
+    if src_prefix == "":
+        src_prefix = dst_prefix
+    for i in range(count):
+        postfix = "" if count == 1 else str(i)
+        for entry in type:
+            _, width, name = _get_pin(entry)
+            print(dst_prefix + "_" + name + postfix + " <= " + src_prefix + "_" + name + postfix + ";")
 
 def gen_cat(type, prefix):
     out = "{"
@@ -91,7 +127,3 @@ def count_bits(type):
             size = 1
         bits += size
     print(bits, end="")
-
-# Test stuff
-if __name__ == '__main__':
-    print("This file is not supposed to be run directly.")
