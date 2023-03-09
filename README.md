@@ -6,4 +6,6 @@ It's currently used in several of my projects such as RISu*64 RISC-V processors 
 
 ## License
 
-The PyHP code preprocessor (pyhp.py) is licensed under GPLv2. All other code are dual licensed under GPLv2 and MIT. The project as a whole is therefore licensed under GPLv2.
+Unless otherwise specified, the source code is licensed under MIT.
+
+The PyHP code preprocessor (pyhp.py) is licensed under GPLv2. The code processor is provided in the repo for convenience, but shouldn't be considered as part of the project (It's not dynamically or statically linked into other part of the program, rather functions as a text processor to consume other files.)
