@@ -1,4 +1,4 @@
-# manjuu
+# Manjū
 
 Manjuu is a python preprocessor module library for Verilog. It allows python code to be inserted and evaluated as preprocessor code inside Verilog module, for generating ports, wires, etc. Note Manjuu is not an HDL.
 
