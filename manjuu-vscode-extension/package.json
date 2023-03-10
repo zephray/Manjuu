@@ -1,0 +1,25 @@
+{
+  "name": "manjuu",
+  "displayName": "Manjuu",
+  "description": "Basic Manjuu Language Highlighting",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.76.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "pyv",
+      "aliases": ["pyv", "pyv"],
+      "extensions": [".pyv"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "pyv",
+      "scopeName": "source.pyv",
+      "path": "./syntaxes/pyv.tmLanguage.json"
+    }]
+  }
+}
