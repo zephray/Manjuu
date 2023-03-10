@@ -23,6 +23,8 @@
 import math
 import copy
 
+defines = {}
+
 def reverse(type):
     reversed = copy.deepcopy(type)
     for entry in reversed:
@@ -127,3 +129,33 @@ def count_bits(type):
             size = 1
         bits += size
     print(bits, end="")
+
+def parse_value(value):
+    number = ""
+    if value[0] == "'": # number without bitwidth
+        number = value[1:]
+    elif value[0].isdigit(): # number with bitwidth or without format
+        br = value.find("'")
+        if br == -1: # Without format
+            number = value
+        else:
+            number = value[br+1:]
+    else: # treat as a string literal
+        return value
+    if number[0] == "d":
+        return int(number[1:])
+    elif number[0] == "h":
+        return int(number[1:], 16)
+    elif number[0] == "b":
+        return int(number[1:], 2)
+    else:
+        return int(number)
+
+def define(name, value):
+    gvar = globals()
+    gvar[name] = parse_value(value)
+    defines[name] = value
+
+def gen_defines():
+    for key, value in defines.items():
+        print("`define", key, value)

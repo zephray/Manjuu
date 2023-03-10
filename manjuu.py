@@ -21,7 +21,8 @@
 # SOFTWARE.
 #
 from manjuu_base import *
-from manjuu_bus import *
+# Only base library is by default imported. Additional libraries can be imported
+# in the user module.
 from manjuu_user import *
 
 # Test stuff
