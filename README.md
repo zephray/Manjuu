@@ -110,7 +110,6 @@ module A (
         if (in_valid) begin
             cur_data <= in_data;
             cur_cmd <= in_cmd;
-
         end
     end
     /* Module implementation */
@@ -142,23 +141,153 @@ module Top ();
 endmodule
 ```
 
+### Data array
+
+In parameterized designs, it's common for a module to have a configurable signal list. For example, a multi-ported RAM or a bus arbiter, would have parameterized port count. A straight-forward implementation would be to use an array in the module signal list:
+
+```verilog
+module dual_port_ram(
+    input wire [63:0] wdata [0:1],
+    output wire [63:0] rdata [0:1],
+    input wire [4:0] addr [0:1],
+    input wire wen [0:1]
+);
+```
+
+However not all tools support such syntax. For example, Vivado doesn't support using array inside port signal list. A common workaround is to concat things into a wider signal:
+
+```verilog
+module dual_port_ram(
+    input wire [127:0] wdata,
+    output wire [127:0] rdata,
+    input wire [9:0] addr,
+    input wire [1:0] wen
+);
+```
+
+Which is a bit confusing and not particularly easy to work with. Manjuu supports turning bundles into an array directly as a parameter inside previously mentioned functions. For example, the following is a dual-port RAM model:
+
+```verilog
+module dual_port_ram(
+    input wire clk,
+    <% gen_port("ram", ram_req_t, reg=False, count=NR_PORTS, last_comma=False) %>
+);
+    reg [63:0] ram [31:0];
+    always @(posedge clk) begin
+        <%
+        for i in range(NR_PORTS):
+            print(f"if (ram_wen{i}) begin")
+            print(f"    ram[ram_addr{i}] <= ram_wdata{i};")
+            print(f"end")
+            print(f"ram_rdata{i} <= ram[ram_addr{i}];")
+        %>
+    end
+endmodule
+```
+
+It gets expanded to:
+
+```verilog
+module dual_port_ram (
+    input wire clk,
+    input wire [63:0] ram_wdata0,
+    output wire [63:0] ram_rdata0,
+    input wire [4:0] ram_addr0,
+    input wire ram_wen0,
+    input wire [63:0] ram_wdata1,
+    output wire [63:0] ram_rdata1,
+    input wire [4:0] ram_addr1,
+    input wire ram_wen1
+);
+    reg [63:0] ram[31:0];
+    always @(posedge clk) begin
+        if (ram_wen0) begin
+            ram[ram_addr0] <= ram_wdata0;
+        end
+        ram_rdata0 <= ram[ram_addr0];
+        if (ram_wen1) begin
+            ram[ram_addr1] <= ram_wdata1;
+        end
+        ram_rdata1 <= ram[ram_addr1];
+
+    end
+endmodule
+```
+
+It gets a bit ugly, and connecting multiple ports could ended up being a daunting task. Luckily, generating and connecting wire for arrays can be done similarly as well:
+
+```verilog
+<% gen_wire("ram", ram_req_t, count=NR_PORTS) %>
+
+dual_port_ram dual_port_ram(
+    .clk(clk),
+    <% gen_connect("ram", ram_req_t, count=NR_PORTS, last_comma=False) %>
+);
+```
+
+It would then be expanded accordingly.
+
+### Packing and unpacking
+
+Verilog doesn't really offer much support for generics. While it may be possible to use the port list generation to create copies of the same module with different post signal type, it's a lot of duplicated code. In some cases, it is simply easier to pack stuff into a big bit vector and later unpack them.
+
+For example, to buffer a RGB565 signal through a FIFO:
+
+```python
+rgb_t = [["o", "r", 5], ["o", "g", 6], ["o", "b", 5]]
+```
+
+```verilog
+fifo #(.WIDTH(<% count_bits(rgb_t) %>)) rgb_fifo (
+    .clk(clk),
+    .a_data(<% gen_cat(rgb_t, "in") %>),
+    .a_valid(in_valid),
+    .a_ready(in_ready),
+    .b_data(<% gen_cat(rgb_t, "out") %>),
+    .b_valid(out_valid),
+    .b_ready(out_ready)
+);
+```
+
+It gets expanded to:
+
+```
+fifo #(
+    .WIDTH(16)
+) rgb_fifo (
+    .clk(clk),
+    .a_data({in_r, in_g, in_b}),
+    .a_valid(in_valid),
+    .a_ready(in_ready),
+    .b_data({out_r, out_g, out_b}),
+    .b_valid(out_valid),
+    .b_ready(out_ready)
+);
+```
+
+Note how `count_bits()` is used to determine the width of the resulting bit vector and sets the width of the fifo.
+
 ### Defines
 
 Sometimes there are some constants that's needed in both python code and verilog code, Manjuu provides a way to easily define them in both sides:
 
 ```python
 define("CMD_INVALID", "3'd1")
-define("DATA_WIDTH", "64")
+```
+
+Or, if the number is only intended to be used in python environment, a simple assignment is good enough:
+
+```python
+DATA_WIDTH = 64
 ```
 
 Then by calling the function `gen_defines()` it gets expanded to:
 
 ```verilog
 `define CMD_INVALID 3'd1
-`define DATA_WIDTH 64
 ```
 
-And they are available to use inside python code as well:
+And use the defined const (either by direct assignment or using the `define()` function):
 
 ```python
 port = [["i", "dat", DATA_WIDTH]]
@@ -174,6 +303,7 @@ There are tons of alternatives solutions that provides similar functionalities a
 - It's dumb: it doesn't try to be smart to fill in any gaps, it only does what explicitly told to do, to avoid covering up bugs
 - Clean and human-readable generated code: the output is clean, with no random-ish generated labels or any directives
 - Pre-processing always gets run during build: avoid bugs caused by old dangling generated code
+- Easy to extend and modify: it's based on a very simple model so it's easy to pick up and add features as needed
 
 ## License
 
