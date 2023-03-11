@@ -22,6 +22,7 @@
 #
 import math
 import copy
+import builtins
 
 defines = {}
 
@@ -152,8 +153,7 @@ def parse_value(value):
         return int(number)
 
 def define(name, value):
-    gvar = globals()
-    gvar[name] = parse_value(value)
+    builtins.__dict__[name] = parse_value(value)
     defines[name] = value
 
 def gen_defines():
