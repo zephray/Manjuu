@@ -1,4 +1,5 @@
 {
+    "//Reference": "Based on MSHR-H VSCode Verilog plugin: https://github.com/mshr-h/vscode-verilog-hdl-support/tree/main",
     "$schema": "https://json.schemastore.org/syntaxes-2.0",
     "fileTypes": ["pyv"],
     "name": "pyv",
@@ -37,6 +38,16 @@
             "name": "embedded.python",
             "begin": "^.*<%",
             "end": "%>",
+            "beginCaptures": {
+              "0": { 
+                "name": "invalid.embedded.python"
+               }
+            },
+            "endCaptures": {
+              "0": { 
+                "name": "invalid.control.embedded.python"
+              }
+            },
             "patterns": [{
                 "include": "source.python"
             }]

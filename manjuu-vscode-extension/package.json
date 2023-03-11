@@ -10,16 +10,35 @@
     "Programming Languages"
   ],
   "contributes": {
-    "languages": [{
-      "id": "pyv",
-      "aliases": ["pyv", "pyv"],
-      "extensions": [".pyv"],
-      "configuration": "./language-configuration.json"
-    }],
-    "grammars": [{
-      "language": "pyv",
-      "scopeName": "source.pyv",
-      "path": "./syntaxes/pyv.tmLanguage.json"
-    }]
-  }
+    "languages": [
+      {
+        "id": "pyv",
+        "aliases": [
+          "pyv"
+        ],
+        "extensions": [
+          ".pyv"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "pyv",
+        "scopeName": "source.pyv",
+        "path": "./syntaxes/pyv.tmLanguage.json"
+      }
+    ]
+  },
+  "dependencies": {
+    "@vscode/vsce": "^2.18.0",
+    "vsce": "^2.15.0"
+  },
+	"__metadata": {
+		"publisherDisplayName": "Anhang Li",
+		"targetPlatform": "undefined",
+		"isApplicationScoped": false,
+		"isPreReleaseVersion": true,
+		"preRelease": true
+	}
 }

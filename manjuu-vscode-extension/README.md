@@ -5,9 +5,18 @@
 - [ ] Manjuu Snippets
 - [ ] Examples
 
-Note: 
+## Packaging Guide
 
-Lines like this will not work because the python syntax is expected to capture everything until line break. The embedded python has a higher priority than the pyv syntax.
+[Publishing Extensions](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)
+```
+> npm install -g @vscode/vsce
+
+> vsce package
+```
+
+## Usage Notes 
+
+Python lines like import * and comments will not work, because the python syntax is expected to capture everything until line break. The embedded python has a higher priority than the pyv syntax.
 
 ```
     <% from manjuu import * %>
