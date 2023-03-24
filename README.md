@@ -6,22 +6,22 @@ The project is inspired by similar usage in OpenPiton. It's currently used in se
 
 ## Introduction
 
-The Manjuu allows embedding python code inside verilog code. For example:
+The basic idea is that the Manjuu allows embedding python code inside verilog code. For example:
 
 ```verilog
-    reg [31:0] counter;
-    always @(posedge clk) begin
-        <% print("counter <= counter + 1;") %>
-    end
+reg [31:0] counter;
+always @(posedge clk) begin
+    <% print("counter <= counter + 1;") %>
+end
 ```
 
 Would be expanded to
 
 ```verilog
-    reg [31:0] counter;
-    always @(posedge clk) begin
-        counter <= counter + 1;
-    end
+reg [31:0] counter;
+always @(posedge clk) begin
+    counter <= counter + 1;
+end
 ```
 
 Obviously this is not very interesting or useful by its own. Usually, the Manjuu libraries are used together.
@@ -44,11 +44,11 @@ req_t = [
 As you could see it's really just a python list with special meanings. The general structure is
 
 ```python
-    [
-        [direction, name, width], # Entry with explict width
-        [direction, name], # Entry with width = 1
-        ... # More entries
-    ]
+[
+    [direction, name, width], # Entry with explict width
+    [direction, name], # Entry with width = 1
+    ... # More entries
+]
 ```
 
 The direction is a string, can be `i`, `o`, or `io`. The width is the width of the signal in bits. For example `input [7:0] data` becomes `["i", "data", 8]`.
@@ -63,8 +63,11 @@ There are 2 common bundle operations that allows modifying the bundle:
 
 - Reverse: reverse the direction of all signals in a bundle
 - Handshake: add ready valid handshaking signal to a bundle
+- Prefix: add prefix to signal names
 
 Note the handshake always add the signal from the perspective of receiver: valid is an input and ready is a output.
+
+Prefix is typically only used in building nested bundles. 
 
 ### Port, wire, and connections
 

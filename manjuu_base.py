@@ -42,6 +42,18 @@ def handshake(type):
     result.append(["o", "ready"])
     return result
 
+def prefix(prefix, type):
+    result = copy.deepcopy(type)
+    for entry in result:
+        entry[1] = prefix + "_" + entry[1]
+    return result
+
+def _get_width(entry):
+    if len(entry) == 3:
+        return entry[2]
+    else:
+        return 1
+
 def _get_pin(entry):
     if len(entry) == 3:
         direction, name, size = entry
